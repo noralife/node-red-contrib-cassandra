@@ -4,7 +4,7 @@ module.exports = function (RED) {
 
     function CassandraNode(n) {
         RED.nodes.createNode(this, n);
-        this.host = n.host;
+        this.hosts = n.hosts;
         this.port = n.port;
 
         this.connected = false;
@@ -26,7 +26,7 @@ module.exports = function (RED) {
 
             // TODO: Support other port, default is 9042
             node.connection = new cassandra.Client({
-                contactPoints: node.hosts,
+                contactPoints: node.hosts.replace(/ /g, "").split(","),
                 keyspace: node.keyspace,
                 authProvider: authProvider
             });
@@ -52,7 +52,7 @@ module.exports = function (RED) {
         this.on('close', function (done) {
             if (this.tick) { clearTimeout(this.tick); }
             if (this.connection) {
-                node.connection.end(function(err) {
+                node.connection.shutdown(function (err) {
                     if (err) { node.error(err); }
                     done();
                 });
@@ -77,13 +77,13 @@ module.exports = function (RED) {
         if (this.mydbConfig) {
             this.mydbConfig.connect();
             var node = this;
-            node.on("input", function(msg) {
+            this.on("input", function(msg) {
                 if (typeof msg.topic === 'string') {
                     console.log("query:",msg.topic);
                     node.mydbConfig.connection.execute(msg.topic, function(err, result) {
                         if (err) { node.error(err,msg); }
                         else {
-                            msg.payload = result.row;
+                            msg.payload = result.rows;
                             node.send(msg);
                         }
                     });

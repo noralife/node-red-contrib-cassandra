@@ -1,7 +1,7 @@
 <script type="text/x-red" data-template-name="CassandraDatabase">
     <div class="form-row">
-        <label for="node-config-input-host"><i class="fa fa-globe"></i> Hosts</label>
-        <input type="text" id="node-config-input-host">
+        <label for="node-config-input-hosts"><i class="fa fa-globe"></i> Hosts</label>
+        <input type="text" id="node-config-input-hosts">
     </div>
     <div class="form-row">
         <label for="node-config-input-port"><i class="fa fa-random"></i> Port</label>
@@ -25,10 +25,8 @@
     RED.nodes.registerType('CassandraDatabase',{
         category: 'config',
         defaults: {
-            host: {value:"127.0.0.1",required:true},
+            hosts: {value:"127.0.0.1",required:true},
             port: {value:"9042",required:true},
-            //user: {value:"",required:true},
-            //pass: {value:"",required:true},
             keyspace: {value:"",required:true}
         },
         credentials: {
@@ -36,7 +34,7 @@
             password: {type: "password"}
         },
         label: function() {
-            return this.db;
+            return this.keyspace;
         }
     });
 </script>
@@ -44,7 +42,7 @@
 
 <script type="text/x-red" data-template-name="cassandra">
     <div class="form-row">
-        <label for="node-input-mydb"><i class="fa fa-database"></i> Database</label>
+        <label for="node-input-mydb"><i class="fa fa-database"></i> Keyspace</label>
         <input type="text" id="node-input-mydb">
     </div>
     <div class="form-row">
