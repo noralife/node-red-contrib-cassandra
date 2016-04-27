@@ -54,8 +54,8 @@
 <script type="text/x-red" data-help-name="cassandra">
     <p>Allows basic access to a Cassandra database.</p>
     <p>This node uses the <b>query</b> operation against the configured database. This does allow  SELECTS, INSERTS, UPDATES and DELETES.</p>
-    <p><code>msg.topic</code> must hold the <i>query</i> for the database, and the result is returned in <code>msg.payload</code>.</p>
-    <p><code>msg.payload</code> can contain an array of values to bind to the topic.</p>
+    <p><code>msg.topic</code> must either hold the <i>query</i> (string) for the database or an array of <i>queries</i> (which triggers a batch execution), and the result is returned in <code>msg.payload</code>.</p>
+    <p><code>msg.payload</code> can contain an optional array of values to bind to the topic.</p>
     <p>Typically the returned payload will be an array of the result rows.</p>
     <p>If nothing is found for the key then <i>null</i> is returned,</p>
 </script>
