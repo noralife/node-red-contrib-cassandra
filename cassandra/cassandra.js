@@ -80,7 +80,8 @@ module.exports = function (RED) {
             this.on("input", function(msg) {
                 if (typeof msg.topic === 'string') {
                     console.log("query:",msg.topic);
-                    node.mydbConfig.connection.execute(msg.topic, function(err, result) {
+                    var params = msg.payload || [];
+                    node.mydbConfig.connection.execute(msg.topic, params, {prepare: true}, function(err, result) {
                         if (err) { node.error(err,msg); }
                         else {
                             msg.payload = result.rows;
