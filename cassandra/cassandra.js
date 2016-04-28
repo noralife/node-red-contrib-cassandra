@@ -78,18 +78,27 @@ module.exports = function (RED) {
             this.mydbConfig.connect();
             var node = this;
             this.on("input", function(msg) {
-                if (typeof msg.topic === 'string') {
-                    console.log("query:",msg.topic);
-                    node.mydbConfig.connection.execute(msg.topic, function(err, result) {
-                        if (err) { node.error(err,msg); }
-                        else {
-                            msg.payload = result.rows;
-                            node.send(msg);
-                        }
-                    });
+                var batchMode = Array.isArray(msg.topic);
+                if (!batchMode && typeof msg.topic !== 'string') {
+                    node.error("msg.topic : the query is not defined as a string or as an array of queries");
+                    return;
                 }
-                else {
-                    if (typeof msg.topic !== 'string') { node.error("msg.topic : the query is not defined as a string"); }
+                var resCallback = function(err, result) {
+                    if (err) {
+                        node.error(err,msg);
+                    } else {
+                        msg.payload = result.rows;
+                        node.send(msg);
+                    }
+                };
+
+                if (batchMode) {
+                    node.log("Batching " + msg.topic.length + " CQL queries");
+                    node.mydbConfig.connection.batch(msg.topic, {prepare: true}, resCallback);
+                } else {
+                    node.log("Executing CQL query: ", msg.topic);
+                    var params = msg.payload || [];
+                    node.mydbConfig.connection.execute(msg.topic, params, {prepare: true}, resCallback);
                 }
             });
         }
